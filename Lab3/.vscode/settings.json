@@ -1,4 +1,4 @@
 {
-    "python.pythonPath": "/home/zetako/anaconda3/bin/python",
+    "python.pythonPath": "/home/zetako/.conda/envs/zetako/bin/python",
     "jupyter.jupyterServerType": "remote"
 }
