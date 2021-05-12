@@ -3,7 +3,7 @@ import torch.nn.functional as func
 import torch.utils.data as data
 import numpy as np
 
-# Hyperparameter
+### Hyperparameter
 NUM_EPOCHS = 100
 DEVICE = 'cuda:0'
 USE_CUDA = False
@@ -12,7 +12,16 @@ BATCH = 100
 LEARN_RATE = 0.05
 CNN_TYPE = 'LeNet'
 
-# CNN class
+### CNN class
+# Share Function: expansion of data
+def expansion(x):
+    dims = x.size()[1:]
+    ret = 1
+    for d in dims:
+        ret *= d
+    return ret
+
+# Original LeNet
 class LeNet(torch.nn.Module):
     def __init__(self):
         super(LeNet, self).__init__()
@@ -28,7 +37,32 @@ class LeNet(torch.nn.Module):
         x = self.pool(func.relu(x))
         x = self.conv2(x)
         x = self.pool(func.relu(x))
-        x = x.reshape(-1, LeNet.expansion(x))
+        x = x.reshape(-1, expansion(x))
+        x = func.relu(self.l1(x))
+        x = func.relu(self.l2(x))
+        x = func.softmax(self.l3(x), dim = 1)
+        return x
+
+# LeNet with add conv 
+class LeNet_Add_Conv(torch.nn.Module):
+    def __init__(self):
+        super(LeNet_Add_Conv, self).__init__()
+        self.pool = torch.nn.MaxPool2d(2, 2)
+        self.conv1 = torch.nn.Conv2d(3, 6, 5)
+        self.conv2 = torch.nn.Conv2d(6, 8, 5)
+        self.conv3 = torch.nn.Conv2d(8, 16, 5)
+        self.l1 = torch.nn.Linear(16*5*5, 120)
+        self.l2 = torch.nn.Linear(120, 84)
+        self.l3 = torch.nn.Linear(84, 10)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.pool(func.relu(x))
+        x = self.conv2(x)
+        x = self.pool(func.relu(x))
+        x = self.conv3(x)
+        x = self.pool(func.relu(x))
+        x = x.reshape(-1, expansion(x))
         x = func.relu(self.l1(x))
         x = func.relu(self.l2(x))
         x = func.softmax(self.l3(x), dim = 1)
@@ -41,9 +75,51 @@ class LeNet(torch.nn.Module):
             ret *= d
         return ret
 
-class LeNet_add_conv(torch.nn.Module):
+# LeNet with avg_pool
+class LeNet_Avg_Pool(torch.nn.Module):
+    def __init__(self):
+        super(LeNet, self).__init__()
+        self.pool = torch.nn.AvgPool2d(2, 2)
+        self.conv1 = torch.nn.Conv2d(3, 6, 5)
+        self.conv2 = torch.nn.Conv2d(6, 16, 5)
+        self.l1 = torch.nn.Linear(16*5*5, 120)
+        self.l2 = torch.nn.Linear(120, 84)
+        self.l3 = torch.nn.Linear(84, 10)
 
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.pool(func.relu(x))
+        x = self.conv2(x)
+        x = self.pool(func.relu(x))
+        x = x.reshape(-1, expansion(x))
+        x = func.relu(self.l1(x))
+        x = func.relu(self.l2(x))
+        x = func.softmax(self.l3(x), dim = 1)
+        return x
 
+# LeNet with larger filter
+class LeNet_Large_Filter(torch.nn.Module):
+    def __init__(self):
+        super(LeNet, self).__init__()
+        self.pool = torch.nn.AvgPool2d(2, 2)
+        self.conv1 = torch.nn.Conv2d(3, 12, 5)
+        self.conv2 = torch.nn.Conv2d(12, 32, 5)
+        self.l1 = torch.nn.Linear(32*5*5, 120)
+        self.l2 = torch.nn.Linear(120, 84)
+        self.l3 = torch.nn.Linear(84, 10)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.pool(func.relu(x))
+        x = self.conv2(x)
+        x = self.pool(func.relu(x))
+        x = x.reshape(-1, expansion(x))
+        x = func.relu(self.l1(x))
+        x = func.relu(self.l2(x))
+        x = func.softmax(self.l3(x), dim = 1)
+        return x
+
+### Running Code
 # Dataset
 train_images = np.load("cifar10_train_images.npy")
 train_labels = np.load("cifar10_train_labels.npy")
@@ -51,7 +127,6 @@ train_size = train_images.shape[0]
 test_images = np.load("cifar10_test_images.npy")
 test_labels = np.load("cifar10_test_labels.npy")
 test_size = test_images.shape[0]
-
 
 # Linear Model
 CNN_model = eval(CNN_TYPE+'()')
