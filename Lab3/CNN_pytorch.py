@@ -2,6 +2,7 @@ import torch
 import torch.nn.functional as func
 import torch.utils.data as data
 import numpy as np
+import time
 
 ### Hyperparameter
 NUM_EPOCHS = 100
@@ -147,7 +148,9 @@ if USE_CUDA:
     test_images = test_images.to(DEVICE)
     test_labels = test_labels.to(DEVICE)
 
+correct_history = []
 for epoch in range(NUM_EPOCHS):
+    start_time = time.time()
     for index, (image, label) in enumerate(train_dataLoader):
         if USE_CUDA:
             image = image.to(DEVICE)
@@ -158,12 +161,18 @@ for epoch in range(NUM_EPOCHS):
         loss = loss_func(pred, label)
         loss.backward()
         optimizer.step()
+    end_time = time.time()
+    epoch_dur = (end_time - start_time) * 1000
         
     test_pred = CNN_model(test_images)
     test_pred = torch.max(test_pred, 1)[1]
     correct = test_pred.eq(test_labels).sum().item()
     correct = correct / test_size
+    correct_history.append(correct)
 
     # print
     if DISPLAY and epoch % DISPLAY == 0:
-        print("epoch={}/{}, loss={:g}, correct={:.4%}".format(epoch, NUM_EPOCHS, loss, correct))
+        print("epoch={}/{}, loss={:g}, correct={:.4%}, time used={:.4f}ms".format(epoch, NUM_EPOCHS, loss, correct, epoch_dur))
+
+correct_history = np.array(correct_history)
+np.save(CNN_TYPE+'.npy', correct_history)
