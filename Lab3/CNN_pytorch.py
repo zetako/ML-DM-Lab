@@ -49,10 +49,10 @@ class LeNet_Add_Conv(torch.nn.Module):
     def __init__(self):
         super(LeNet_Add_Conv, self).__init__()
         self.pool = torch.nn.MaxPool2d(2, 2)
-        self.conv1 = torch.nn.Conv2d(3, 6, 5)
-        self.conv2 = torch.nn.Conv2d(6, 8, 5)
-        self.conv3 = torch.nn.Conv2d(8, 16, 5)
-        self.l1 = torch.nn.Linear(16*5*5, 120)
+        self.conv1 = torch.nn.Conv2d(3, 6, 3)
+        self.conv2 = torch.nn.Conv2d(6, 16, 3)
+        self.conv3 = torch.nn.Conv2d(16, 32, 3)
+        self.l1 = torch.nn.Linear(32*2*2, 120)
         self.l2 = torch.nn.Linear(120, 84)
         self.l3 = torch.nn.Linear(84, 10)
 
