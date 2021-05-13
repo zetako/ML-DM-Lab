@@ -4,14 +4,24 @@ import torch.utils.data as data
 import time
 
 # Hyperparameter
-NUM_EPOCHS = 5000
+NUM_EPOCHS = 100
 BATCH = 100
 DEVICE = 'cuda:0'
 USE_CUDA = False
-DISPLAY = 1000
+DISPLAY = 1
 LEARN_RATE = 0.05
 MOMENTUM = 0.9
-OPTIM_TYPE = 'SGD'
+OPTIM_TYPE = 'Adam'
+
+class LC(torch.nn.Module):
+    def __init__(self):
+        super(LC, self).__init__()
+        self.linear = torch.nn.Linear(3*32*32, 10)
+        
+    def forward(self, x):
+        x = x.reshape(-1, 3*32*32)
+        x = self.linear(x)
+        return x
 
 # Dataset
 train_images = np.load("cifar10_train_images.npy")
@@ -22,7 +32,7 @@ test_labels = np.load("cifar10_test_labels.npy")
 test_size = test_images.shape[0]
 
 # Linear Model
-linear_model = torch.nn.Linear(32*32*3, 10)
+linear_model = LC()
 loss_func = torch.nn.CrossEntropyLoss()
 if OPTIM_TYPE == 'SGD':
     optimizer = torch.optim.SGD(linear_model.parameters(), lr = LEARN_RATE)

@@ -7,11 +7,11 @@ import time
 # Hyperparameter
 NUM_EPOCHS = 100
 DEVICE = 'cuda:0'
-USE_CUDA = True
+USE_CUDA = False
 DISPLAY = 1
 BATCH = 100
 LEARN_RATE = 0.05
-MLP_LAYER = 'normal'
+MLP_LAYER = 'plus'
 
 # MLP class
 class MLP(torch.nn.Module):
@@ -33,7 +33,7 @@ class MLP(torch.nn.Module):
 # MLP class with more layer
 class MLP_PP(torch.nn.Module):
     def __init__(self):
-        super(MLP, self).__init__()
+        super(MLP_PP, self).__init__()
         self.l1 = torch.nn.Linear(32*32*3, 32*16*3)
         self.l2 = torch.nn.Linear(32*16*3, 16*16*3)
         self.l3 = torch.nn.Linear(16*16*3, 16*8*3)
@@ -87,6 +87,7 @@ if USE_CUDA:
 
 correct_history = []
 for epoch in range(NUM_EPOCHS):
+    #print('start epoch {}({})'.format(epoch, epoch % DISPLAY))
     start_time = time.time()
     for index, (image, label) in enumerate(train_dataLoader):
         if USE_CUDA:
@@ -94,16 +95,22 @@ for epoch in range(NUM_EPOCHS):
             label = label.to(DEVICE)
         # cal
         optimizer.zero_grad()
+        #print('start {}'.format(index))
         pred = MLP_model(image)
+        #print('pred')
         loss = loss_func(pred, label)
+        #print('loss')
         loss.backward()
+        #print('backward')
         optimizer.step()
-        
+        #print('step')
+    end_time = time.time()
     test_pred = MLP_model(test_images)
     test_pred = torch.max(test_pred, 1)[1]
     correct = test_pred.eq(test_labels).sum().item()
     correct = correct / test_size
     correct_history.append(correct)
+    epoch_dur = (end_time - start_time) * 1000
 
     # print
     if DISPLAY and epoch % DISPLAY == 0:

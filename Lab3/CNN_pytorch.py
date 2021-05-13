@@ -11,7 +11,7 @@ USE_CUDA = False
 DISPLAY = 1
 BATCH = 100
 LEARN_RATE = 0.05
-CNN_TYPE = 'LeNet'
+CNN_TYPE = 'LeNet_Large_Filter'
 
 ### CNN class
 # Share Function: expansion of data
@@ -79,7 +79,7 @@ class LeNet_Add_Conv(torch.nn.Module):
 # LeNet with avg_pool
 class LeNet_Avg_Pool(torch.nn.Module):
     def __init__(self):
-        super(LeNet, self).__init__()
+        super(LeNet_Avg_Pool, self).__init__()
         self.pool = torch.nn.AvgPool2d(2, 2)
         self.conv1 = torch.nn.Conv2d(3, 6, 5)
         self.conv2 = torch.nn.Conv2d(6, 16, 5)
@@ -101,7 +101,7 @@ class LeNet_Avg_Pool(torch.nn.Module):
 # LeNet with larger filter
 class LeNet_Large_Filter(torch.nn.Module):
     def __init__(self):
-        super(LeNet, self).__init__()
+        super(LeNet_Large_Filter, self).__init__()
         self.pool = torch.nn.AvgPool2d(2, 2)
         self.conv1 = torch.nn.Conv2d(3, 12, 5)
         self.conv2 = torch.nn.Conv2d(12, 32, 5)
