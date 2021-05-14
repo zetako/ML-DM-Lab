@@ -4,14 +4,14 @@ import torch.utils.data as data
 import time
 
 # Hyperparameter
-NUM_EPOCHS = 100
+NUM_EPOCHS = 1000
 BATCH = 100
 DEVICE = 'cuda:0'
 USE_CUDA = False
-DISPLAY = 1
+DISPLAY = 10
 LEARN_RATE = 0.05
 MOMENTUM = 0.9
-OPTIM_TYPE = 'Adam'
+OPTIM_TYPE = 'SGD'
 
 class LC(torch.nn.Module):
     def __init__(self):
